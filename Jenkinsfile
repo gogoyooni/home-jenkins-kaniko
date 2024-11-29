@@ -63,13 +63,7 @@ pipeline {
          stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
-                    withCredentials([file(credentialsId: 'mykubeconfig', variable: 'KUBECONFIG')]) {
-                        script {
-                            // 환경변수 치환을 위한 sed 명령어 사용
-                            sh """                               
-                                echo "DOCKER_IMAGE=${DOCKER_IMAGE}, DOCKER_TAG=${DOCKER_TAG}"
-                            """
-                    }
+                    sh 'kubectl -version'
                 }
             }
         }
