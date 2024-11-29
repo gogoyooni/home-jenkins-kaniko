@@ -43,18 +43,21 @@ pipeline {
         DOCKER_TAG = "${BUILD_NUMBER}"
     }
     
-    stage('Test Kubernetes Connection') {
-        steps {
-            container('kubectl') {
-                script {
-                    sh """
-                        echo "Testing API server connection..."
-                        curl -k https://kubernetes.default.svc
-                    """
+    stages {
+        stage('Test Kubernetes Connection') {
+                steps {
+                    container('kubectl') {
+                        script {
+                            sh """
+                                echo "Testing API server connection..."
+                                curl -k https://kubernetes.default.svc
+                            """
+                        }
+                    }
                 }
             }
-        }
     }
+    
 
 
     post {
