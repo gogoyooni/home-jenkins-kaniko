@@ -13,6 +13,11 @@ pipeline {
                     volumeMounts:
                     - name: docker-config
                       mountPath: /kaniko/.docker
+                - name: kubectl
+                    image: bitnami/kubectl:latest
+                    command:
+                    - cat
+                    tty: true
                   volumes:
                   - name: docker-config
                     secret:
