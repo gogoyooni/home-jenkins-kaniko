@@ -44,9 +44,23 @@ pipeline {
                             /kaniko/executor \
                             --context=${WORKSPACE} \
                             --dockerfile=${WORKSPACE}/Dockerfile \
-                            --destination=${DOCKER_IMAGE}:${DOCKER_TAG} \
-                            --destination=${DOCKER_IMAGE}:latest
+                            --destination=${DOCKER_IMAGE}:${DOCKER_TAG}
                         '''
+                    }
+                }
+            }
+        }
+
+         stage('Deploy to Kubernetes') {
+            steps {
+                container('kubectl') {
+                    script {
+                        // 환경변수 치환을 위한 sed 명령어 사용
+                        sh """
+                            sed -i 's|\${DOCKER_IMAGE}|${DOCKER_IMAGE}|g' k8s/deployment.yaml
+                            sed -i 's|\${DOCKER_TAG}|${DOCKER_TAG}|g' k8s/deployment.yaml
+                            kubectl apply -f k8s/deployment.yaml
+                        """
                     }
                 }
             }
