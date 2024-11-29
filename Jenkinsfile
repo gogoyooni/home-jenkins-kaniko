@@ -19,6 +19,9 @@ pipeline {
                     command:
                     - cat
                     tty: true
+                    volumeMounts:
+                    - mountPath: /root/.kube
+                      name: kube-config
                   volumes:
                   - name: docker-config
                     secret:
@@ -63,7 +66,20 @@ pipeline {
          stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
-                    sh 'kubectl -version'
+                    sh """
+                    # 현재 사용자 확인
+                    whoami
+                    # 홈 디렉토리 확인
+                    echo \$HOME
+                    # kubeconfig 파일 확인
+                    ls -la /root/.kube/
+                    
+                    kubectl get pods
+                    echo "DOCKER_IMAGE=${DOCKER_IMAGE}, DOCKER_TAG=${DOCKER_TAG}"
+                    sed -i 's|\${DOCKER_IMAGE}|${DOCKER_IMAGE}|g' k8s/deployment.yaml
+                    sed -i 's|\${DOCKER_TAG}|${DOCKER_TAG}|g' k8s/deployment.yaml
+                    kubectl apply -f k8s/deployment.yaml
+                """
                 }
             }
         }
