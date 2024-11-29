@@ -28,7 +28,7 @@ pipeline {
                           path: config.json
                   - name: kube-config
                     secret:
-                      secretName: kube-config    # kubectl 설정을 위한 시크릿
+                      secretName: kube-config
             '''
         }
     }
@@ -60,12 +60,11 @@ pipeline {
             }
         }
 
-         stage('Deploy to Kubernetes') {
+        stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
                     withCredentials([file(credentialsId: 'mykubeconfig', variable: 'KUBECONFIG')]) {
                         script {
-                            // 환경변수 치환을 위한 sed 명령어 사용
                             sh """
                                 kubectl get pods || exit 1
                                 echo "DOCKER_IMAGE=${DOCKER_IMAGE}, DOCKER_TAG=${DOCKER_TAG}"
@@ -73,16 +72,16 @@ pipeline {
                                 sed -i 's|\${DOCKER_TAG}|${DOCKER_TAG}|g' k8s/deployment.yaml
                                 kubectl apply -f k8s/deployment.yaml
                             """
+                        }
                     }
                 }
             }
         }
     }
-}
 
     post {
         always {
-            cleanWs()  // 워크스페이스 정리
+            cleanWs()
         }
     }
 }
