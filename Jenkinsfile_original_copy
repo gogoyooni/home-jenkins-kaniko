@@ -43,14 +43,45 @@ pipeline {
         DOCKER_TAG = "${BUILD_NUMBER}"
     }
     
-    stage('Test Kubernetes Connection') {
-        steps {
-            container('kubectl') {
-                script {
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build and Push Docker Image') {
+            steps {
+                container('kaniko') {
+                    script {
+                        sh '''
+                            /kaniko/executor \
+                            --context=${WORKSPACE} \
+                            --dockerfile=${WORKSPACE}/Dockerfile \
+                            --destination=${DOCKER_IMAGE}:${DOCKER_TAG}
+                        '''
+                    }
+                }
+            }
+        }
+
+         stage('Deploy to Kubernetes') {
+            steps {
+                container('kubectl') {
                     sh """
-                        echo "Testing API server connection..."
-                        curl -k https://kubernetes.default.svc
-                    """
+                    # 현재 사용자 확인
+                    whoami
+                    # 홈 디렉토리 확인
+                    echo \$HOME
+                    # kubeconfig 파일 확인
+                    ls -la /root/.kube/
+                    
+                    kubectl get pods
+                    echo "DOCKER_IMAGE=${DOCKER_IMAGE}, DOCKER_TAG=${DOCKER_TAG}"
+                    sed -i 's|\${DOCKER_IMAGE}|${DOCKER_IMAGE}|g' k8s/deployment.yaml
+                    sed -i 's|\${DOCKER_TAG}|${DOCKER_TAG}|g' k8s/deployment.yaml
+                    kubectl apply -f k8s/deployment.yaml
+                """
                 }
             }
         }
