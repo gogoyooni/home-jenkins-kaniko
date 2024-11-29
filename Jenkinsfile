@@ -66,6 +66,8 @@ pipeline {
                     script {
                         // 환경변수 치환을 위한 sed 명령어 사용
                         sh """
+                            kubectl get pods || exit 1
+                            echo "DOCKER_IMAGE=${DOCKER_IMAGE}, DOCKER_TAG=${DOCKER_TAG}"
                             sed -i 's|\${DOCKER_IMAGE}|${DOCKER_IMAGE}|g' k8s/deployment.yaml
                             sed -i 's|\${DOCKER_TAG}|${DOCKER_TAG}|g' k8s/deployment.yaml
                             kubectl apply -f k8s/deployment.yaml
