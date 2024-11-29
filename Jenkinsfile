@@ -25,7 +25,7 @@ pipeline {
     }
     
     environment {
-        DOCKER_IMAGE = "taeyoondev/kaniko-home-test:v1"
+        DOCKER_IMAGE = "taeyoondev/kaniko-home-test"
         DOCKER_TAG = "${BUILD_NUMBER}"
     }
     
