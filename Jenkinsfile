@@ -4,6 +4,7 @@ pipeline {
             yaml '''
                 kind: Pod
                 spec:
+                  serviceAccountName: jenkins-admin
                   containers:
                   - name: kaniko
                     image: gcr.io/kaniko-project/executor:debug
@@ -25,6 +26,9 @@ pipeline {
                       items:
                         - key: .dockerconfigjson
                           path: config.json
+                  - name: kube-config
+                    secret:
+                      secretName: kube-config    # kubectl 설정을 위한 시크릿
             '''
         }
     }
