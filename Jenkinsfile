@@ -68,11 +68,12 @@ pipeline {
             }
         }
     }
-}
+
 
     post {
         always {
             cleanWs()  // 워크스페이스 정리
         }
     }
+
 }
