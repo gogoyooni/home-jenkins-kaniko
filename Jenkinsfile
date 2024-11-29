@@ -46,14 +46,8 @@ pipeline {
     stages {
         stage('Test Kubernetes Connection') {
                 steps {
-                    container('kubectl') {
-                        script {
-                            sh """
-                                echo "Testing API server connection..."
-                                curl -k https://kubernetes.default.svc
-                            """
-                        }
-                    }
+                    kubernetesDeploy configs: "k8s/deployment.yaml", kubeconfigId: 'mykubeconfig'
+                    sh "echo 'test'" 
                 }
             }
     }
