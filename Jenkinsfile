@@ -45,11 +45,18 @@ pipeline {
     
     stages {
         stage('Test Kubernetes Connection') {
-                steps {
-                    kubernetesDeploy configs: "k8s/deployment.yaml", kubeconfigId: 'mykubeconfig'
-                    sh "echo 'test'" 
+            steps {
+                container('kubectl') {
+                    script {
+                        sh """
+                            echo "Testing kubectl connection..."
+                            kubectl version --client
+                            kubectl get pods
+                        """
+                    }
                 }
             }
+        }
     }
     
 
