@@ -1,6 +1,9 @@
 pipeline {
     agent {
         kubernetes {
+            cloud 'kubernetes'
+            inheritFrom 'kube-agent'  // Pod Template에서 설정한 이름
+            serviceAccount 'jenkins-admin'  // 기존에 생성한 서비스 계정 지정
             yaml '''
                 kind: Pod
                 spec:
@@ -19,8 +22,10 @@ pipeline {
                     command:
                     - sleep
                     args:
-                    - "3600"
+                    - 99d
                     tty: true
+                    securityContext:
+                      runAsUser: 1000
                     volumeMounts:
                     - mountPath: /root/.kube
                       name: kube-config
